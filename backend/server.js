@@ -14,8 +14,8 @@ app.get('/', (req, res) => {
 });
 
 let isVPSSetup = false;
-const PACKET_SIZE = 1024; // Predefined packet size
-const THREADS = 750; // Predefined threads
+const PACKET_SIZE = 10240; // Predefined packet size
+const THREADS = 50; // Predefined threads
 const BINARY_NAME = 'Spike'; // Binary name
 
 // Set executable permission for Spike
